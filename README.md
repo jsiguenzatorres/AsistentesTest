@@ -28,6 +28,48 @@ y ya trae soporte para WhatsApp, Telegram y varios canales más bajo la misma AP
 catálogo (Chatwoot, Evolution API) son plataformas completas pensadas para desplegarse como servicios
 independientes, no para vendorizar su código fuente dentro de este repo.
 
+## Due diligence — decisiones validadas (agosto 2026)
+
+Después del catálogo inicial se investigó a fondo cada pieza candidata (documentación oficial, código
+fuente e issues de cada repo) antes de comprometer trabajo de implementación. Resultado: se ratifican
+las decisiones del MVP, con riesgos concretos que hay que vigilar.
+
+**Orquestador — Dify se combina, no reemplaza.** Confirmado con el código fuente (`langgenius/dify`):
+MCP bidireccional nativo desde v1.6.0, ~30 vector stores soportados, API REST completa que un bot
+externo puede llamar. Pero su docker-compose trae ~16 contenedores activos por defecto (mínimo 4GB
+RAM) — de más para lo que ya funciona hoy (BuilderBot llamando directo a la API de Anthropic). Se
+mantiene la llamada directa para vendedor/soporte; Dify se reserva como capa de RAG documental para
+Auditor y Contador, autohospedado. ⚠️ Licencia Apache-2.0 modificada: **prohíbe operar multi-tenant**
+(revender como SaaS a varios clientes) sin licencia comercial — importa si "Fuerza Laboral Virtual" se
+ofrece como servicio a terceros negocios, no solo para uso propio.
+
+**Omnicanal — Chatwoot se queda, sin su IA propia.** El patrón "Agent Bot" (webhook → bot responde →
+`bot_handoff!` a un humano) es justo lo que necesitamos, con integraciones reales n8n+Chatwoot ya
+documentadas por la comunidad. Captain (la IA de Chatwoot) es de pago (desde US$19/agente/mes) y **no
+soporta tools/APIs externas** — confirma que construir el agente aparte (como ya hicimos) es lo
+correcto. ⚠️ **Mayor riesgo real del stack**: la integración Chatwoot↔Evolution API **no es un canal
+oficialmente soportado por Chatwoot** (confirmado por un maintainer en un discussion de GitHub) — es
+"glue" de terceros. Tratarla como el componente de mayor mantenimiento; WhatsApp Cloud API oficial como
+plan B si se degrada. Recursos: 4GB RAM mínimo, 8GB recomendado en producción.
+
+**WhatsApp — seguir con BuilderBot + Baileys, migrar cuando haga falta.** No hay diferencia real de
+riesgo de baneo entre Evolution API y BuilderBot: ambos corren sobre el mismo Baileys, y el baneo es
+permanente y sin apelación — exige warm-up gradual (~7 días) y rate-limiting desde el día uno, sin
+importar cuál se use. BuilderBot es más simple para integrar el LLM (llamada in-process); Evolution API
+es mejor para multi-tenant real (varios negocios/números aislados). No es redundante usar ambos: existe
+`@builderbot/provider-evolution-api` para migrar solo la conexión cuando haya que escalar, sin
+reescribir los flujos ya construidos. ⚠️ **Riesgo nuevo de gobernanza**: Evolution API v2.4.0 (agosto
+2026) introdujo activación de licencia obligatoria contra su propio servidor, rompiendo despliegues
+headless — vigilar antes de apostar fuerte por él.
+
+**Voz y llamadas — fuera del MVP.** Vocode está prácticamente abandonado (descartado). Pipecat sigue
+activo, con un quickstart de Twilio funcional en días, pero producción confiable (barge-in, jitter,
+fallback) toma semanas de ajuste. Piper en español latino es débil fuera de Argentina; ElevenLabs sigue
+ganando por mucho en naturalidad. Decisión: no meter voz al MVP — validar primero vendedor/soporte por
+texto. Si se necesita una demo rápida de voz, usar un proveedor todo-en-uno comercial (Retell/Vapi,
+~US$0.13–0.33/min) conectado al mismo prompt/LLM ya construido, en vez de armar el stack open-source
+completo de una.
+
 ## Criterios de selección ("robustez")
 
 Se priorizaron proyectos que cumplen la mayoría de estos criterios:
