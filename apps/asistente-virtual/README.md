@@ -53,11 +53,22 @@ cp .env.example .env      # completa ANTHROPIC_API_KEY y, si usas Telegram, TELE
 npm run dev:whatsapp       # imprime un QR en consola para vincular el número (usa Baileys)
 # o
 npm run dev:telegram       # requiere TELEGRAM_BOT_TOKEN (@BotFather)
+# o
+npm run dev:evolution      # requiere Evolution API corriendo (ver ../infra/) + EVOLUTION_* en .env
 ```
 
-Para producción a escala, la recomendación (ver `README.md` raíz) es migrar el canal WhatsApp de
-Baileys (protocolo no oficial) a la **WhatsApp Cloud API** oficial de Meta vía
-[Evolution API](../infra/), y usar Chatwoot como bandeja para el traspaso a un agente humano.
+`CHANNEL=evolution` usa `@builderbot/provider-evolution-api` para hablar con una instancia de
+[Evolution API](../infra/) en vez de manejar Baileys directo desde este proceso — es el camino para
+cuando haya que escalar a **varios números/negocios** (Evolution API sí soporta multi-instancia real).
+**Está cableado pero no probado end-to-end**: este sandbox no tiene daemon de Docker, así que no se pudo
+levantar Evolution API para probar la conexión real; sí se validó que el proyecto compila y que el
+provider recibe los argumentos correctos (`baseURL`, `apiKey`, `instanceName`). Antes de usarlo en serio,
+probarlo contra una instancia real de Evolution API y revisar sus webhooks entrantes.
+
+Para empezar sin infraestructura adicional, `dev:whatsapp` (Baileys directo) sigue siendo la opción más
+simple — ver la nota de "Due diligence" en el `README.md` raíz sobre por qué no hay diferencia de riesgo
+de baneo entre ambos caminos, y cuándo sí conviene migrar a Evolution API o a la WhatsApp Cloud API
+oficial de Meta.
 
 ## Limitaciones conocidas de este prototipo (a propósito, para no sobre-construir)
 
