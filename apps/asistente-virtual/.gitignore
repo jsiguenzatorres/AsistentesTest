@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+db.json
+db.json.tmp
+bot_sessions/
+*.log

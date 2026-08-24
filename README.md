@@ -2,7 +2,31 @@
 
 Investigación de los repositorios open-source más robustos y demandados para construir un equipo de **"empleados virtuales"** (vendedor, capacitador, soporte técnico, atención al cliente, auditor, contador) desplegable en **WhatsApp, Telegram, redes sociales y llamadas de voz**, con **voz humanizada en español/latino** y **presencia visual profesional (avatar)**.
 
-> Estado del repositorio: este documento es el punto de partida técnico del proyecto `AsistentesTest`. Aún no contiene código de implementación.
+> Estado del repositorio: `apps/asistente-virtual` ya es un prototipo runnable (roles vendedor y
+> atención al cliente, sobre BuilderBot) — ver [Prototipo](#prototipo) más abajo. `infra/` trae la
+> infraestructura Docker de Evolution API + Chatwoot para el siguiente paso (canal real + bandeja
+> omnicanal), aún no desplegada.
+
+## Prototipo
+
+Primer prototipo runnable del MVP descrito en la hoja de ruta: dos "empleados virtuales" (vendedor y
+atención al cliente/soporte) construidos sobre **BuilderBot**, con enrutamiento por intención, memoria de
+conversación y una base de conocimiento propia por rol.
+
+- **[`apps/asistente-virtual`](apps/asistente-virtual/)** — código Node.js/TypeScript, corre sin Docker.
+  `npm install && npm run chat` abre un chat de prueba por terminal (sin necesitar WhatsApp real ni
+  credenciales de LLM: sin `ANTHROPIC_API_KEY` responde en modo demo, para poder validar la lógica).
+- **[`infra/`](infra/)** — `docker-compose.yml` de Evolution API (WhatsApp) + Chatwoot (omnicanal),
+  basado en la configuración oficial de ambos proyectos. No se pudo probar en este sandbox de
+  desarrollo (no hay daemon de Docker disponible aquí); queda listo para desplegar en un VPS/servidor
+  con Docker.
+
+Se eligió **BuilderBot** como base del prototipo (en vez de clonar Chatwoot/Evolution API/Dify
+completos) porque es una librería npm pura en Node.js — se puede instalar, ejecutar y probar
+directamente en cualquier entorno de desarrollo sin infraestructura adicional (Postgres, Redis, Docker),
+y ya trae soporte para WhatsApp, Telegram y varios canales más bajo la misma API. Los otros repos del
+catálogo (Chatwoot, Evolution API) son plataformas completas pensadas para desplegarse como servicios
+independientes, no para vendorizar su código fuente dentro de este repo.
 
 ## Criterios de selección ("robustez")
 

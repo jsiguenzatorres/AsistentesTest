@@ -1,0 +1,29 @@
+{
+  "name": "asistente-virtual",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Prototipo de empleados virtuales (vendedor + atencion al cliente/soporte) multicanal, construido sobre BuilderBot.",
+  "type": "commonjs",
+  "scripts": {
+    "chat": "tsx src/cli/chat.ts",
+    "dev:whatsapp": "CHANNEL=whatsapp tsx src/app.ts",
+    "dev:telegram": "CHANNEL=telegram tsx src/app.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@builderbot/bot": "1.4.2",
+    "@builderbot/database-json": "1.4.2",
+    "@builderbot/provider-baileys": "1.4.2",
+    "@builderbot/provider-telegram": "1.4.2",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "overrides": {
+    "baileys": "7.0.0-rc14",
+    "sharp": "0.35.3"
+  }
+}
